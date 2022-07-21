@@ -11,6 +11,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 @RestController
 public class ArtistController
 {
@@ -44,7 +48,15 @@ public class ArtistController
                 //Close the scanner
                 scanner.close();
 
-                System.out.println(inline);
+                //Using the JSON simple library parse the string into a json object
+                JSONParser parse = new JSONParser();
+                JSONArray artistArray = (JSONArray) parse.parse(inline);
+
+                //Get the required object from the above created object
+                JSONObject obj = (JSONObject) artistArray.get(0);
+                //Get the required data using its key
+                System.out.println(obj.get("name"));
+
             }
 
         } catch (Exception e) {
