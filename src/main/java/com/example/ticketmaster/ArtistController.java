@@ -101,7 +101,8 @@ public class ArtistController
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "ERROR: No Venue found with id = " + id;
+        System.out.println("ERROR: No Venue found with id = " + id);
+        return "TBA"; // Return To Be Announced for Unknown venues
     }
 
     private JSONArray getEventsList() {
