@@ -15,7 +15,7 @@ import org.json.simple.parser.ParseException;
 public class ArtistController
 {
 
-    private JSONArray getArtistsFromTicketMaster () {
+    private JSONArray getArtists () {
         try {
 
             URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json");
@@ -105,19 +105,84 @@ public class ArtistController
         return "ERROR: No Venue found with id = " + id;
     }
 
+    private JSONArray getEventsList() {
+        try {
+
+            URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/events.json");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.connect();
+
+            //Getting the response code
+            int responsecode = conn.getResponseCode();
+
+            if (responsecode != 200) {
+                throw new RuntimeException("HttpResponseCode: " + responsecode);
+            } else
+            {
+
+                String inline = "";
+                Scanner scanner = new Scanner(url.openStream());
+
+                //Write all the JSON data into a string using a scanner
+                while (scanner.hasNext())
+                {
+                    inline += scanner.nextLine();
+                }
+
+                //Close the scanner
+                scanner.close();
+
+                //Using the JSON simple library parse the string into a json object
+                JSONParser parse = new JSONParser();
+                JSONArray eventList = (JSONArray) parse.parse(inline);
+
+                return eventList;
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JSONArray();
+    }
+
     @GetMapping("/api/artists")
     @ResponseBody
-    public String getArtists(@RequestParam(required = false) String id) {
+    public String getArtistInformation(@RequestParam(required = false) String id) {
         if (id == null) {
             return "ERROR:  You must provide an Artist ID number";
         }
-        JSONArray artistList = getArtistsFromTicketMaster();
+        // This object will be used to store all the information
+        // we want to return about this artist
+        JSONObject artistInformation = new JSONObject();
+        // Get the name and personal information for the artist
+        JSONArray artistList = getArtists();
         for (int i = 0; i < artistList.size(); i++) {
             JSONObject artist = (JSONObject) artistList.get(i);
             System.out.println("Artist Name:  " + artist.get("name"));
             if (artist.get("id").equals(id)) {
-                System.out.println("The venue with id = 45 is " + getVenueNameFromId("45"));
-                return "The artist with id = " + id + " is " + artist.get("name");
+                // We found the artist in the list
+                artistInformation.put("name", artist.get("name"));
+                // Now get the list of all events for this artist and their venues
+                JSONArray eventList = getEventsList();
+                for (int x = 0; x < eventList.size(); x++) {
+                    JSONObject event = (JSONObject) eventList.get(x);
+                    // Get the list of artists for this particular event
+                    JSONArray eventArtistList = (JSONArray) event.get("artists");
+                    for (int y = 0; y < eventArtistList.size(); y++) {
+                        JSONObject eventArtist = (JSONObject) eventArtistList.get(y);
+                        if (eventArtist.get("id").equals(id)) {
+                            // Our artist is performing at this event
+                            // Get the name of the venue
+                            JSONObject venue = (JSONObject) event.get("venue");
+                            String venueName = getVenueNameFromId(venue.get("id").toString());
+                            System.out.println("Artist is performing in "+ event.get("title") + " at " + venueName);
+                        }
+                    }
+                }
+                return artistInformation.toJSONString();
             }
         }
         return "ERROR:  No artist found with id = "+ id;
@@ -126,7 +191,7 @@ public class ArtistController
     @GetMapping(path="/api/testing", produces = "application/json")
     public String testing()
     {
-        getArtistsFromTicketMaster();
+        getArtists();
         return "{\"Testing\"}";
     }
 }
