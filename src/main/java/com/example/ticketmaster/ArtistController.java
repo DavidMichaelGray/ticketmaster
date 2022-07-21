@@ -56,6 +56,54 @@ public class ArtistController
         }
         return (new JSONArray ());
     }
+    private String getVenueNameFromId (String id) {
+        try {
+
+            URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/venues.json");
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.connect();
+
+            //Getting the response code
+            int responsecode = conn.getResponseCode();
+
+            if (responsecode != 200) {
+                throw new RuntimeException("HttpResponseCode: " + responsecode);
+            } else
+            {
+
+                String inline = "";
+                Scanner scanner = new Scanner(url.openStream());
+
+                //Write all the JSON data into a string using a scanner
+                while (scanner.hasNext())
+                {
+                    inline += scanner.nextLine();
+                }
+
+                //Close the scanner
+                scanner.close();
+
+                //Using the JSON simple library parse the string into a json object
+                JSONParser parse = new JSONParser();
+                JSONArray venueList = (JSONArray) parse.parse(inline);
+
+                for (int i = 0; i < venueList.size(); i++) {
+                    JSONObject venue = (JSONObject) venueList.get(i);
+                    System.out.println("Venue name: " + venue.get("name"));
+                    if (venue.get("id").equals(id)) {
+                        return venue.get("name").toString();
+                    }
+                }
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "ERROR: No Venue found with id = " + id;
+    }
 
     @GetMapping("/api/artists")
     @ResponseBody
@@ -66,8 +114,9 @@ public class ArtistController
         JSONArray artistList = getArtistsFromTicketMaster();
         for (int i = 0; i < artistList.size(); i++) {
             JSONObject artist = (JSONObject) artistList.get(i);
-            System.out.println(artist.get("name"));
+            System.out.println("Artist Name:  " + artist.get("name"));
             if (artist.get("id").equals(id)) {
+                System.out.println("The venue with id = 45 is " + getVenueNameFromId("45"));
                 return "The artist with id = " + id + " is " + artist.get("name");
             }
         }
