@@ -156,6 +156,8 @@ public class ArtistController
         // This object will be used to store all the information
         // we want to return about this artist
         JSONObject artistInformation = new JSONObject();
+        // This array will be used to store a list of all the artist's performances
+        JSONArray artistPerformances = new JSONArray();
         // Get the name and personal information for the artist
         JSONArray artistList = getArtists();
         for (int i = 0; i < artistList.size(); i++) {
@@ -177,9 +179,15 @@ public class ArtistController
                             JSONObject venue = (JSONObject) event.get("venue");
                             String venueName = getVenueNameFromId(venue.get("id").toString());
                             System.out.println("Artist "+ artist.get("name") + " is performing in "+ event.get("title") + " at " + venueName);
+                            JSONObject performance = new JSONObject();
+                            performance.put("event", event.get("title"));
+                            performance.put("venue", venueName);
+                            artistPerformances.add(performance);
                         }
                     }
                 }
+                // Add the list of performances to the information returned about the artist
+                artistInformation.put("performances", artistPerformances);
                 return artistInformation.toJSONString();
             }
         }
