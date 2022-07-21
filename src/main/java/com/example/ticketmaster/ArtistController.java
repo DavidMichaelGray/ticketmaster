@@ -1,11 +1,7 @@
 package com.example.ticketmaster;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,7 +15,7 @@ import org.json.simple.parser.ParseException;
 public class ArtistController
 {
 
-    private void getArtistsFromTicketMaster () {
+    private JSONArray getArtistsFromTicketMaster () {
         try {
 
             URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json");
@@ -52,20 +48,38 @@ public class ArtistController
                 JSONParser parse = new JSONParser();
                 JSONArray artistArray = (JSONArray) parse.parse(inline);
 
-                //Get the required object from the above created object
-                JSONObject obj = (JSONObject) artistArray.get(0);
-                //Get the required data using its key
-                System.out.println(obj.get("name"));
-
+//                //Get the required object from the above created object
+//                JSONObject obj = (JSONObject) artistArray.get(0);
+//                //Get the required data using its key
+//                System.out.println(obj.get("name"));
+                return artistArray;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return (new JSONArray ());
     }
 
-    @GetMapping(path="/artists", produces = "application/json")
-    public String getEmployees()
+    @GetMapping("/api/artists")
+    @ResponseBody
+    public String getArtists(@RequestParam(required = false) String id) {
+        if (id == null) {
+            return "ERROR:  You must provide an Artist ID number";
+        }
+        JSONArray artistList = getArtistsFromTicketMaster();
+        for (int i = 0; i < artistList.size(); i++) {
+            JSONObject artist = (JSONObject) artistList.get(i);
+            System.out.println(artist.get("name"));
+            if (artist.get("id").equals(id)) {
+                return "The artist with id = " + id + " is " + artist.get("name");
+            }
+        }
+        return "ID: " + id;
+    }
+
+    @GetMapping(path="/api/testing", produces = "application/json")
+    public String testing()
     {
         getArtistsFromTicketMaster();
         return "{\"Testing\"}";
