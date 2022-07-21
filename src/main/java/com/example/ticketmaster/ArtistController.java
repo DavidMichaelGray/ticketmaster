@@ -91,7 +91,6 @@ public class ArtistController
 
                 for (int i = 0; i < venueList.size(); i++) {
                     JSONObject venue = (JSONObject) venueList.get(i);
-                    System.out.println("Venue name: " + venue.get("name"));
                     if (venue.get("id").equals(id)) {
                         return venue.get("name").toString();
                     }
@@ -161,7 +160,6 @@ public class ArtistController
         JSONArray artistList = getArtists();
         for (int i = 0; i < artistList.size(); i++) {
             JSONObject artist = (JSONObject) artistList.get(i);
-            System.out.println("Artist Name:  " + artist.get("name"));
             if (artist.get("id").equals(id)) {
                 // We found the artist in the list
                 artistInformation.put("name", artist.get("name"));
@@ -178,7 +176,7 @@ public class ArtistController
                             // Get the name of the venue
                             JSONObject venue = (JSONObject) event.get("venue");
                             String venueName = getVenueNameFromId(venue.get("id").toString());
-                            System.out.println("Artist is performing in "+ event.get("title") + " at " + venueName);
+                            System.out.println("Artist "+ artist.get("name") + " is performing in "+ event.get("title") + " at " + venueName);
                         }
                     }
                 }
