@@ -48,10 +48,6 @@ public class ArtistController
                 JSONParser parse = new JSONParser();
                 JSONArray artistArray = (JSONArray) parse.parse(inline);
 
-//                //Get the required object from the above created object
-//                JSONObject obj = (JSONObject) artistArray.get(0);
-//                //Get the required data using its key
-//                System.out.println(obj.get("name"));
                 return artistArray;
             }
 
@@ -75,7 +71,7 @@ public class ArtistController
                 return "The artist with id = " + id + " is " + artist.get("name");
             }
         }
-        return "ID: " + id;
+        return "ERROR:  No artist found with id = "+ id;
     }
 
     @GetMapping(path="/api/testing", produces = "application/json")
