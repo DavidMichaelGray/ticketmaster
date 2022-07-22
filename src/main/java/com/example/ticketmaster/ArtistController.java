@@ -174,6 +174,7 @@ public class ArtistController
                 {
                     // We found the artist in the list
                     artistInformation.put("name", artist.get("name"));
+                    artistInformation.put("id", artist.get("id"));
                     artistInformation.put("rank", artist.get("rank"));
                     artistInformation.put("url", artist.get("url"));
                     artistInformation.put("imgSrc", artist.get("imgSrc"));
