@@ -182,32 +182,45 @@ public class ArtistController
                     for (int x = 0; x < eventList.size(); x++)
                     {
                         JSONObject event = (JSONObject) eventList.get(x);
-                        // Get the list of artists for this particular event
-                        JSONArray eventArtistList = (JSONArray) event.get("artists");
-                        for (int y = 0; y < eventArtistList.size(); y++)
+                        // Make sure this event is not hidden from searching
+                        boolean eventhidden = false;
+                        try {
+                            if ((boolean) event.get("hiddenFromSearch")) {
+                                eventhidden = true;
+                            }
+                        } catch (Exception e) {
+                            // hiddenFromSearch field is not present, so the event is not hidden
+                        }
+                        // If this event is hidden, then we can skip it
+                        if (!eventhidden)
                         {
-                            JSONObject eventArtist = (JSONObject) eventArtistList.get(y);
-                            if (eventArtist.get("id").equals(id))
+                            // Get the list of artists for this particular event
+                            JSONArray eventArtistList = (JSONArray) event.get("artists");
+                            for (int y = 0; y < eventArtistList.size(); y++)
                             {
-                                // Our artist is performing at this event
-                                // Get the name of the venue
-                                JSONObject venue = (JSONObject) event.get("venue");
-                                String venueName = getVenueNameFromId(venue.get("id").toString());
-                                System.out.println("Artist " + artist.get("name") + " is performing in " + event.get("title") + " at " + venueName);
-                                JSONObject performance = new JSONObject();
-                                performance.put("venue", venueName);
-                                performance.put("event", event.get("title"));
-                                String eventDate;
-                                try
+                                JSONObject eventArtist = (JSONObject) eventArtistList.get(y);
+                                if (eventArtist.get("id").equals(id))
                                 {
-                                    // If the event has a startDate, then save the date
-                                    eventDate = event.get("startDate").toString();
-                                } catch (Exception e)
-                                {
-                                    eventDate = "TBA"; // To Be Announced
+                                    // Our artist is performing at this event
+                                    // Get the name of the venue
+                                    JSONObject venue = (JSONObject) event.get("venue");
+                                    String venueName = getVenueNameFromId(venue.get("id").toString());
+                                    System.out.println("Artist " + artist.get("name") + " is performing in " + event.get("title") + " at " + venueName);
+                                    JSONObject performance = new JSONObject();
+                                    performance.put("venue", venueName);
+                                    performance.put("event", event.get("title"));
+                                    String eventDate;
+                                    try
+                                    {
+                                        // If the event has a startDate, then save the date
+                                        eventDate = event.get("startDate").toString();
+                                    } catch (Exception e)
+                                    {
+                                        eventDate = "TBA"; // To Be Announced
+                                    }
+                                    performance.put("date", eventDate);
+                                    artistPerformances.add(performance);
                                 }
-                                performance.put("date", eventDate);
-                                artistPerformances.add(performance);
                             }
                         }
                     }
