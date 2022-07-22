@@ -220,6 +220,7 @@ public class ArtistController
                                     }
                                     performance.put("date", eventDate);
                                     artistPerformances.add(performance);
+                                    break; // Exit the for loop to avoid bad data where artist is listed more than once for an event
                                 }
                             }
                         }
