@@ -151,72 +151,82 @@ public class ArtistController
     @GetMapping("/api/artists")
     @ResponseBody
     public JSONObject getArtistInformation(@RequestParam(required = false) String id) {
-        if (id == null) {
-            JSONObject errorJSON = new JSONObject();
-            errorJSON.put("success", false);
-            errorJSON.put("message", "ERROR:  No Artist Id field specified");
-            return errorJSON;
-        }
-        // This object will be used to store all the information
-        // we want to return about this artist
-        JSONObject artistInformation = new JSONObject();
-        // This array will be used to store a list of all the artist's performances
-        JSONArray artistPerformances = new JSONArray();
-        // Get the name and personal information for the artist
-        JSONArray artistList = getArtists();
-        for (int i = 0; i < artistList.size(); i++) {
-            JSONObject artist = (JSONObject) artistList.get(i);
-            if (artist.get("id").equals(id)) {
-                // We found the artist in the list
-                artistInformation.put("name", artist.get("name"));
-                artistInformation.put("rank", artist.get("rank"));
-                artistInformation.put("url", artist.get("url"));
-                artistInformation.put("imgSrc", artist.get("imgSrc"));
-                // Now get the list of all events for this artist and their venues
-                JSONArray eventList = getEventsList();
-                for (int x = 0; x < eventList.size(); x++) {
-                    JSONObject event = (JSONObject) eventList.get(x);
-                    // Get the list of artists for this particular event
-                    JSONArray eventArtistList = (JSONArray) event.get("artists");
-                    for (int y = 0; y < eventArtistList.size(); y++) {
-                        JSONObject eventArtist = (JSONObject) eventArtistList.get(y);
-                        if (eventArtist.get("id").equals(id)) {
-                            // Our artist is performing at this event
-                            // Get the name of the venue
-                            JSONObject venue = (JSONObject) event.get("venue");
-                            String venueName = getVenueNameFromId(venue.get("id").toString());
-                            System.out.println("Artist "+ artist.get("name") + " is performing in "+ event.get("title") + " at " + venueName);
-                            JSONObject performance = new JSONObject();
-                            performance.put("venue", venueName);
-                            performance.put("event", event.get("title"));
-                            String eventDate;
-                            try {
-                                // If the event has a startDate, then save the date
-                                eventDate = event.get("startDate").toString();
-                            } catch (Exception e) {
-                                eventDate = "TBA"; // To Be Announced
+        try
+        {
+            if (id == null)
+            {
+                JSONObject errorJSON = new JSONObject();
+                errorJSON.put("success", false);
+                errorJSON.put("message", "ERROR:  No Artist Id field specified");
+                return errorJSON;
+            }
+            // This object will be used to store all the information
+            // we want to return about this artist
+            JSONObject artistInformation = new JSONObject();
+            // This array will be used to store a list of all the artist's performances
+            JSONArray artistPerformances = new JSONArray();
+            // Get the name and personal information for the artist
+            JSONArray artistList = getArtists();
+            for (int i = 0; i < artistList.size(); i++)
+            {
+                JSONObject artist = (JSONObject) artistList.get(i);
+                if (artist.get("id").equals(id))
+                {
+                    // We found the artist in the list
+                    artistInformation.put("name", artist.get("name"));
+                    artistInformation.put("rank", artist.get("rank"));
+                    artistInformation.put("url", artist.get("url"));
+                    artistInformation.put("imgSrc", artist.get("imgSrc"));
+                    // Now get the list of all events for this artist and their venues
+                    JSONArray eventList = getEventsList();
+                    for (int x = 0; x < eventList.size(); x++)
+                    {
+                        JSONObject event = (JSONObject) eventList.get(x);
+                        // Get the list of artists for this particular event
+                        JSONArray eventArtistList = (JSONArray) event.get("artists");
+                        for (int y = 0; y < eventArtistList.size(); y++)
+                        {
+                            JSONObject eventArtist = (JSONObject) eventArtistList.get(y);
+                            if (eventArtist.get("id").equals(id))
+                            {
+                                // Our artist is performing at this event
+                                // Get the name of the venue
+                                JSONObject venue = (JSONObject) event.get("venue");
+                                String venueName = getVenueNameFromId(venue.get("id").toString());
+                                System.out.println("Artist " + artist.get("name") + " is performing in " + event.get("title") + " at " + venueName);
+                                JSONObject performance = new JSONObject();
+                                performance.put("venue", venueName);
+                                performance.put("event", event.get("title"));
+                                String eventDate;
+                                try
+                                {
+                                    // If the event has a startDate, then save the date
+                                    eventDate = event.get("startDate").toString();
+                                } catch (Exception e)
+                                {
+                                    eventDate = "TBA"; // To Be Announced
+                                }
+                                performance.put("date", eventDate);
+                                artistPerformances.add(performance);
                             }
-                            performance.put("date", eventDate);
-                            artistPerformances.add(performance);
                         }
                     }
+                    artistInformation.put("success", true); // Return a success flag
+                    // Add the list of performances to the information returned about the artist
+                    artistInformation.put("performances", artistPerformances);
+                    return artistInformation;
                 }
-                artistInformation.put("success", true); // Return a success flag
-                // Add the list of performances to the information returned about the artist
-                artistInformation.put("performances", artistPerformances);
-                return artistInformation;
             }
+            JSONObject errorJSON = new JSONObject();
+            errorJSON.put("success", false);
+            errorJSON.put("message", "ERROR:  No artist found with id = " + id);
+            return errorJSON;
+        } catch (Exception e) {
+            // Catch any generic errors
+            JSONObject errorJSON = new JSONObject();
+            errorJSON.put("success", false);
+            errorJSON.put("message", "ERROR:  Error occurred during Artist search");
+            return errorJSON;
         }
-        JSONObject errorJSON = new JSONObject();
-        errorJSON.put("success", false);
-        errorJSON.put("message", "ERROR:  No artist found with id = "+ id);
-        return errorJSON;
-    }
-
-    @GetMapping(path="/api/testing", produces = "application/json")
-    public String testing()
-    {
-        getArtists();
-        return "{\"Testing\"}";
     }
 }
