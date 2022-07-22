@@ -150,9 +150,12 @@ public class ArtistController
 
     @GetMapping("/api/artists")
     @ResponseBody
-    public String getArtistInformation(@RequestParam(required = false) String id) {
+    public JSONObject getArtistInformation(@RequestParam(required = false) String id) {
         if (id == null) {
-            return "ERROR:  You must provide an Artist ID number";
+            JSONObject errorJSON = new JSONObject();
+            errorJSON.put("success", false);
+            errorJSON.put("message", "ERROR:  No Artist Id field specified");
+            return errorJSON;
         }
         // This object will be used to store all the information
         // we want to return about this artist
@@ -166,6 +169,9 @@ public class ArtistController
             if (artist.get("id").equals(id)) {
                 // We found the artist in the list
                 artistInformation.put("name", artist.get("name"));
+                artistInformation.put("rank", artist.get("rank"));
+                artistInformation.put("url", artist.get("url"));
+                artistInformation.put("imgSrc", artist.get("imgSrc"));
                 // Now get the list of all events for this artist and their venues
                 JSONArray eventList = getEventsList();
                 for (int x = 0; x < eventList.size(); x++) {
@@ -181,18 +187,30 @@ public class ArtistController
                             String venueName = getVenueNameFromId(venue.get("id").toString());
                             System.out.println("Artist "+ artist.get("name") + " is performing in "+ event.get("title") + " at " + venueName);
                             JSONObject performance = new JSONObject();
-                            performance.put("event", event.get("title"));
                             performance.put("venue", venueName);
+                            performance.put("event", event.get("title"));
+                            String eventDate;
+                            try {
+                                // If the event has a startDate, then save the date
+                                eventDate = event.get("startDate").toString();
+                            } catch (Exception e) {
+                                eventDate = "TBA"; // To Be Announced
+                            }
+                            performance.put("date", eventDate);
                             artistPerformances.add(performance);
                         }
                     }
                 }
+                artistInformation.put("success", true); // Return a success flag
                 // Add the list of performances to the information returned about the artist
                 artistInformation.put("performances", artistPerformances);
-                return artistInformation.toJSONString();
+                return artistInformation;
             }
         }
-        return "ERROR:  No artist found with id = "+ id;
+        JSONObject errorJSON = new JSONObject();
+        errorJSON.put("success", false);
+        errorJSON.put("message", "ERROR:  No artist found with id = "+ id);
+        return errorJSON;
     }
 
     @GetMapping(path="/api/testing", produces = "application/json")
