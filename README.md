@@ -1,4 +1,4 @@
-# David Gray Interview Assignment for Ticketmaster
+# David Gray Assignment for Ticketmaster
 This is a Spring Boot application that provides a single REST API endpoint to search for an Artist available through Ticketmaster.
 After running the application, the endpoint is accessed at the following URL:  
 
