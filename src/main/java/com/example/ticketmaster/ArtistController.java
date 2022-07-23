@@ -3,11 +3,6 @@ package com.example.ticketmaster;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
