@@ -37,19 +37,19 @@ The endpoint returns a JSON object with all of the information for the artist an
 
 <h2>To run the application</h2>
 
-1. Install Java 17 on your PC
-2. Download the latest **ticketmaster-1.0.jar** from the Release page of this github page
+1. Install JRE (Java Runtime Enviroment) for Java 17 onto your PC
+2. Download the **ticketmaster-1.0.jar** from the Release section of this github page
 3. Type **java -jar ticketmaster-1.0.jar** in the directory where you downloaded the jar file
 4. Browse the REST API endpoint here:  http://localhost:8080/api/artists?id=21
  
 
 <h2>To build and run the application using the source code</h2>
 1. Install the Java Development Kit (JDK) for Java 17 onto your PC<br>  
-2. Install latest version of Maven onto your PC  <br>
+2. Install latest version of Maven onto your PC and add the path to the mvn binary to your PATH  <br>
 3. Click on Code | Download ZIP on this github page to download the source code for the project  <br>
 4. Extract the .zip file into a working directory  <br>
 5. Open a Command Prompt and navigate to the root of the working directory where you unzipped the project <br> 
-6. Type **mvn spring-boot:run** to run the application  <br>
+6. Type <b>mvn spring-boot:run</b> to run the application  <br>
 7. Browse the REST API endpoint here:  http://localhost:8080/api/artists?id=21  <br>
 
 <h2>Implementation Notes and Decisions</h2>
