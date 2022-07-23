@@ -1,5 +1,6 @@
 package com.example.ticketmaster;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -150,7 +151,7 @@ public class ArtistController
 
     @GetMapping("/api/artists")
     @ResponseBody
-    public JSONObject getArtistInformation(@RequestParam(required = false) String id) {
+    public ResponseEntity<JSONObject> getArtistInformation(@RequestParam(required = false) String id) {
         try
         {
             if (id == null)
@@ -158,7 +159,7 @@ public class ArtistController
                 JSONObject errorJSON = new JSONObject();
                 errorJSON.put("success", false);
                 errorJSON.put("message", "ERROR:  No Artist Id field specified");
-                return errorJSON;
+                return new ResponseEntity<JSONObject>(errorJSON, HttpStatus.BAD_REQUEST);
             }
             // This object will be used to store all the information
             // we want to return about this artist
@@ -185,11 +186,14 @@ public class ArtistController
                         JSONObject event = (JSONObject) eventList.get(x);
                         // Make sure this event is not hidden from searching
                         boolean eventhidden = false;
-                        try {
-                            if ((boolean) event.get("hiddenFromSearch")) {
+                        try
+                        {
+                            if ((boolean) event.get("hiddenFromSearch"))
+                            {
                                 eventhidden = true;
                             }
-                        } catch (Exception e) {
+                        } catch (Exception e)
+                        {
                             // hiddenFromSearch field is not present, so the event is not hidden
                         }
                         // If this event is hidden, then we can skip it
@@ -229,19 +233,19 @@ public class ArtistController
                     artistInformation.put("success", true); // Return a success flag
                     // Add the list of performances to the information returned about the artist
                     artistInformation.put("performances", artistPerformances);
-                    return artistInformation;
+                    return new ResponseEntity<JSONObject>(artistInformation, HttpStatus.OK);
                 }
             }
             JSONObject errorJSON = new JSONObject();
             errorJSON.put("success", false);
             errorJSON.put("message", "ERROR:  No artist found with id = " + id);
-            return errorJSON;
+            return new ResponseEntity<JSONObject>(errorJSON, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Catch any generic errors
             JSONObject errorJSON = new JSONObject();
             errorJSON.put("success", false);
             errorJSON.put("message", "ERROR:  Error occurred during Artist search");
-            return errorJSON;
+            return new ResponseEntity<JSONObject>(errorJSON, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

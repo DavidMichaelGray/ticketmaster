@@ -58,5 +58,6 @@ The endpoint returns a JSON object with all of the information for the artist an
 3. I observed that some events have dates and others do not, so I just return blank for the date for the events that do not have one.  I did not change the format of the date.  <br>
 4. Events with the "hideFromSearch" property set to true are excluded from the search results.  <br>
 5. The JSON returned by my REST API endpoint includes a boolean "success" property that indicates whether the search was successful or not.  <br>
- 
+6. Invalid requests to the REST API (e.g. invalid Artist Id) return HTTP Status of 400.
+
 
