@@ -44,13 +44,19 @@ The endpoint returns a JSON object with all of the information for the artist an
  
 
 <h2>To build and run the application using the source code</h2>
-1. Install the Java Development Kit (JDK) for Java 17 onto your PC
-2. Install latest version of Maven onto your PC
-3. Click on Code | Download ZIP on this github page to download the source code for the project
-4. Extract the .zip file into a working directory
-5. Open a Command Prompt and navigate to the root of the working directory where you unzipped the project
-6. Type **mvn spring-boot:run** to run the application
-7. Browse the REST API endpoint here:  http://localhost:8080/api/artists?id=21
+1. Install the Java Development Kit (JDK) for Java 17 onto your PC  
+2. Install latest version of Maven onto your PC  
+3. Click on Code | Download ZIP on this github page to download the source code for the project  
+4. Extract the .zip file into a working directory  
+5. Open a Command Prompt and navigate to the root of the working directory where you unzipped the project  
+6. Type **mvn spring-boot:run** to run the application  
+7. Browse the REST API endpoint here:  http://localhost:8080/api/artists?id=21  
 
-
+<h2>Implementation Notes and Decisions</h2>
+1. I assumed that any of the data might change, so I coded the search to pull the data from S3 every time.  
+2. I observed that venue #40 does not exist, so for events assigned to an invalid venue, I put "TBA" (to be announced) for the venue.  
+3. I observed that some events have dates and others do not, so I just return blank for the date for the events that do not have one.  I did not change the format of the date.  
+4. Events with the "hideFromSearch" property set to true are excluded from the search results.  
+5. The JSON returned by my REST API endpoint includes a boolean "success" property that indicates whether the search was successful or not.  
+ 
 
