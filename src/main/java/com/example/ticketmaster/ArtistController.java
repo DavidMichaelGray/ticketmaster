@@ -11,95 +11,60 @@ import java.util.Scanner;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.springframework.web.client.RestTemplate;
+
 @RestController
 public class ArtistController
 {
 
-    private JSONArray getArtists () {
-        try {
-
-            URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json");
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
-
-            //Getting the response code
-            int responsecode = conn.getResponseCode();
-
+    private JSONArray getArtists ()
+    {
+        try
+        {
+            RestTemplate restTemplate = new RestTemplate();
+            String resourceUrl = "https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json";
+            // Fetch JSON response as String wrapped in ResponseEntity
+            ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl, String.class);
+            int responsecode = response.getStatusCodeValue();
             if (responsecode != 200) {
-                throw new RuntimeException("HttpResponseCode: " + responsecode);
-            } else
-            {
-
-                String inline = "";
-                Scanner scanner = new Scanner(url.openStream());
-
-                //Write all the JSON data into a string using a scanner
-                while (scanner.hasNext())
-                {
-                    inline += scanner.nextLine();
-                }
-
-                //Close the scanner
-                scanner.close();
-
-                //Using the JSON simple library parse the string into a json object
-                JSONParser parse = new JSONParser();
-                JSONArray artistArray = (JSONArray) parse.parse(inline);
-
-                return artistArray;
+                // If the Ticketmaster S3 endpoint failed, then we need to return an error
+                throw new RuntimeException("Ticketmaster S3 endpoint failed.  HttpResponseCode: " + responsecode);
             }
+            String artistsJSON = response.getBody();
+            //Using the JSON simple library parse the string into a json object
+            JSONParser parse = new JSONParser();
+            JSONArray artistArray = (JSONArray) parse.parse(artistsJSON);
 
-        } catch (Exception e) {
+            return artistArray;
+        } catch (Exception e)
+        {
             e.printStackTrace();
         }
-        return (new JSONArray ());
+        return new JSONArray();
     }
     private String getVenueNameFromId (String id) {
         try {
 
-            URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/venues.json");
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
-
-            //Getting the response code
-            int responsecode = conn.getResponseCode();
-
+            RestTemplate restTemplate = new RestTemplate();
+            String resourceUrl = "https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/venues.json";
+            // Fetch JSON response as String wrapped in ResponseEntity
+            ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl, String.class);
+            int responsecode = response.getStatusCodeValue();
             if (responsecode != 200) {
-                throw new RuntimeException("HttpResponseCode: " + responsecode);
-            } else
-            {
-
-                String inline = "";
-                Scanner scanner = new Scanner(url.openStream());
-
-                //Write all the JSON data into a string using a scanner
-                while (scanner.hasNext())
-                {
-                    inline += scanner.nextLine();
-                }
-
-                //Close the scanner
-                scanner.close();
-
-                //Using the JSON simple library parse the string into a json object
-                JSONParser parse = new JSONParser();
-                JSONArray venueList = (JSONArray) parse.parse(inline);
-
-                for (int i = 0; i < venueList.size(); i++) {
-                    JSONObject venue = (JSONObject) venueList.get(i);
-                    if (venue.get("id").equals(id)) {
-                        return venue.get("name").toString();
-                    }
-                }
-
+                // If the Ticketmaster S3 endpoint failed, then we need to return an error
+                throw new RuntimeException("Ticketmaster S3 endpoint failed.  HttpResponseCode: " + responsecode);
             }
-
-        } catch (Exception e) {
+            String venuesJSON = response.getBody();
+            //Using the JSON simple library parse the string into a json object
+            JSONParser parse = new JSONParser();
+            JSONArray venueList = (JSONArray) parse.parse(venuesJSON);
+            for (int i = 0; i < venueList.size(); i++) {
+                JSONObject venue = (JSONObject) venueList.get(i);
+                 if (venue.get("id").equals(id)) {
+                     return venue.get("name").toString();
+                 }
+            }
+          } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("ERROR: No Venue found with id = " + id);
@@ -109,40 +74,20 @@ public class ArtistController
     private JSONArray getEventsList() {
         try {
 
-            URL url = new URL("https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/events.json");
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
-
-            //Getting the response code
-            int responsecode = conn.getResponseCode();
-
+            RestTemplate restTemplate = new RestTemplate();
+            String resourceUrl = "https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/events.json";
+            // Fetch JSON response as String wrapped in ResponseEntity
+            ResponseEntity<String> response = restTemplate.getForEntity(resourceUrl, String.class);
+            int responsecode = response.getStatusCodeValue();
             if (responsecode != 200) {
-                throw new RuntimeException("HttpResponseCode: " + responsecode);
-            } else
-            {
-
-                String inline = "";
-                Scanner scanner = new Scanner(url.openStream());
-
-                //Write all the JSON data into a string using a scanner
-                while (scanner.hasNext())
-                {
-                    inline += scanner.nextLine();
-                }
-
-                //Close the scanner
-                scanner.close();
-
-                //Using the JSON simple library parse the string into a json object
-                JSONParser parse = new JSONParser();
-                JSONArray eventList = (JSONArray) parse.parse(inline);
-
-                return eventList;
-
+                // If the Ticketmaster S3 endpoint failed, then we need to return an error
+                throw new RuntimeException("Ticketmaster S3 endpoint failed.  HttpResponseCode: " + responsecode);
             }
-
+            String eventsJSON = response.getBody();
+            //Using the JSON simple library parse the string into a json object
+            JSONParser parse = new JSONParser();
+            JSONArray eventList = (JSONArray) parse.parse(eventsJSON);
+            return eventList;
         } catch (Exception e) {
             e.printStackTrace();
         }
